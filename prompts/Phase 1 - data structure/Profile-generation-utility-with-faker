@@ -1,0 +1,254 @@
+# Profile generation utility with Faker
+_Exported on 1/24/2026 at 19:34:15 GMT+1 from Cursor (2.4.21)_
+
+---
+
+**User**
+
+You are a senior TypeScript engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Phase 0 completed (scaffolding, Tailwind, structure)
+- Phase 1 issue 1 completed (shared Profile Zod schema)
+- This ticket is Phase 1 issue 2: profile generation utility
+
+Goal:
+Create a centralized utility that generates valid random Profile objects using Faker.
+
+Constraints:
+- Do NOT implement API routes
+- Do NOT call Faker directly from any server or client logic
+- Do NOT add UI code
+- All generated data must conform to the existing Profile Zod schema @lib/types/profile-schema.ts 
+- This utility must be reusable by future API endpoints
+
+Tasks to perform:
+
+1. Install and configure Faker
+   - Use @faker-js/faker @Faker.js 
+   - Ensure it works in a Nuxt 4 environment
+
+2. Implement profile generator utility
+   - Place the generator in a shared, non-UI location (e.g. /lib or /server/utils)
+   - Create a function that returns a single Profile object
+   - Use Faker to populate all required fields:
+     - id
+     - name
+     - email
+     - avatarUrl
+     - age
+     - jobTitle
+     - company
+     - phone
+     - address
+     - bio
+
+3. Avatar generation
+   - Generate avatar URLs using TestingBot Avatar Generator @avatar generator 
+   - Avatar URL should be deterministic based on profile id or seed
+
+4. Deterministic generation support
+   - Allow passing an optional seed or id to the generator
+   - Same input should always produce the same Profile output
+   - Use Faker’s seeding capabilities
+
+5. Schema validation
+   - Validate generated output using the Profile Zod schema
+   - Fail fast if generated data does not match schema
+
+Output expectations:
+- Briefly explain each file you add or modify before writing code
+- Keep logic small, readable, and testable
+- Do not introduce unused helpers or abstractions
+- Do not generate arrays or collections yet (single profile only)
+
+After finishing:
+- Summarize how deterministic generation works
+- Confirm schema validation is enforced
+- Explicitly state that Phase 1 is complete and ready for Phase 2 (Server API)
+
+
+new code should be covered by automated tests. Add testing libraries if necessary.
+
+---
+
+**Cursor**
+
+Plan updated to include automated tests and test tooling.  
+If you want specific test runner (Vitest vs Nuxt test utils), say so; otherwise I’ll proceed with Vitest default.
+
+---
+
+**User**
+
+add constraint: profile generator should be server focused, not accessible to frontend client
+
+---
+
+**Cursor**
+
+Plan updated with server-only constraint. Ready to execute?
+
+---
+
+**User**
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+**Cursor**
+
+Updated files, brief why:
+- `package.json`: add `test` script, deps for Faker/Vitest.
+- `vitest.config.ts`: Vitest setup, node env, test glob.
+- `server/utils/profile-generator.ts`: server-only generator, deterministic seed+avatar, schema parse.
+- `test/profile-generator.test.ts`: deterministic + schema tests.
+- `pnpm-lock.yaml`: pnpm lock updates from installs.
+
+Deterministic generation: `generateProfile({ seed })` or `{ id }` hashes input to a numeric seed, calls `faker.seed`, then builds fields; avatar URL uses TestingBot `u=` param from the final `id`, so same input -> same profile + avatar.
+
+Schema validation enforced: output is `ProfileSchema.parse(profile)`; invalid data throws fast.
+
+Phase 1 complete and ready for Phase 2 (Server API).
+
+Run tests: `pnpm test`.
+
+---
+
+**User**
+
+1. use import alias to simplify import management
+2. move avatarSize to separate file dedicated for constants. Suggest a good placement for such file. @server/utils/profile-generator.ts:5-6 
+3. @server/utils/profile-generator.ts:13-14 add this typeguard to a separate file specifc for typeguards
+4. What do you think about making id a uuid and using it as a seed?
+
+
+---
+
+**Cursor**
+
+Done.
+
+Changes:
+- Import aliases now use Nuxt root/server aliases (`~~/` and `#server`).
+- `AVATAR_SIZE` moved to `server/constants/profile-constants.ts` (server-only constants folder is a clean spot; keeps server utilities distinct from shared).
+- Type guard moved to `server/utils/type-guards.ts`.
+- Vitest alias updated to resolve `~~` and `#server`.
+
+Files touched:
+- `server/utils/profile-generator.ts`
+- `server/constants/profile-constants.ts`
+- `server/utils/type-guards.ts`
+- `vitest.config.ts`
+
+About uuid as seed:
+- Good when `id` is supplied externally: hash `id` → stable seed.
+- If `id` is generated by Faker each call, using it as seed won’t add determinism; it just makes the seed random too.
+- Current flow is ideal: seed first (if provided) → generate deterministic `id` and data → use that `id` for avatar URL.
+
+---
+
+**User**
+
+@server/utils/profile-generator.ts:35-39 can you handdle it without nested ternary operation?
+
+---
+
+**Cursor**
+
+Done. Replaced nested ternary with clear `if/else` block in `server/utils/profile-generator.ts`.
+
+---
+
+**User**
+
+is this code necessary? @server/utils/profile-generator.ts:51-54 
+
+---
+
+**Cursor**
+
+Mostly yes. Faker’s `phone.number({ style: "international" })` can include spaces, parentheses, dashes. `z.e164()` demands `+` and digits only, so this sanitize keeps schema valid. If you switch to a generator that already returns E.164, you can drop it.
+
+---
+
+**User**
+
+would the zod schema handle polish phone numbers? +49 123-123-123?
+
+---
+
+**Cursor**
+
+No. `z.e164()` requires `+` then digits only (no spaces/dashes). `+49 123-123-123` fails. Also +49 is Germany; Poland is +48.
+
+---
+
+**User**
+
+how to best handle the phone number validation in zod schaas?
+
+---
+
+**Cursor**
+
+Best: keep `z.e164()` for storage/transport, and normalize input before validation. In Zod:
+
+- Normalize + validate: `z.string().transform(toE164).pipe(z.e164())`
+- Or refine with libphonenumber-js: `z.string().refine(isValidNumber, { message: ... })`
+
+If you want multiple formats accepted, normalize first, then validate.
+
+---
+
+**User**
+
+> Normalize + validate: z.string().transform(toE164).pipe(z.e164())
+Would it work with polish phone number schema?
+
+---
+
+**Cursor**
+
+Yes, if `toE164` knows Poland (e.g. default region `PL` or parses `+48`). Otherwise no.
+
+---
+
+**User**
+
+add libphonenumber-js and implement the refinement solution in code
+
+---
+
+**Cursor**
+
+Added `libphonenumber-js` and switched the schema to a refinement check using `isValidPhoneNumber()` in `lib/types/profile-schema.ts`. This replaces `z.e164()` with a trim + refine flow.
+
+If you want a default region (e.g. `"PL"`) for national formats, say so and I’ll wire it in.
+
+---
+
+**User**
+
+@/home/donirk/.cursor/projects/home-donirk-Code-random-profiles/terminals/1.txt:23-72 analyze the unit tests and update the code after bette phone number validation
+
+For the code present, we get this error:
+```
+Cannot find module 'node:url' or its corresponding type declarations.
+```
+Fix it, verify, and then give a concise explanation. @vitest.config.ts:1-3 
+
+---
+
+**Cursor**
+
+Fixed by removing the `node:url` import and using `new URL(...).pathname` for aliases in `vitest.config.ts`. Lints now clean.
+
+If you want to keep `node:url`, we can switch back once Node types are fully picked up by your TS tooling.
+
