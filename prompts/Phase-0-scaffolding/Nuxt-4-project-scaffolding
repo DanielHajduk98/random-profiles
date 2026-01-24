@@ -1,0 +1,123 @@
+# Nuxt 4 project scaffolding and setup
+_Exported on 1/24/2026 at 14:16:31 GMT+1 from Cursor (2.4.21)_
+
+---
+
+**User**
+
+You are a senior frontend engineer working on a hiring task.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Styling: Tailwind CSS
+- This is Phase 0: project scaffolding and setup only
+- No feature logic, no API routes, no pages beyond a minimal placeholder
+
+Goal of this phase:
+Deliver a clean, runnable Nuxt 4 project skeleton that follows best practices and is ready for further development.
+
+Constraints:
+- Keep changes minimal and atomic
+- Do NOT implement any business logic
+- Do NOT add mock data, Faker, API routes, or pages beyond a minimal home placeholder
+- Prefer clarity and correctness over cleverness
+
+Tasks to perform (in order):
+
+1. Initialize Nuxt 4 project
+   - Ensure TypeScript is enabled
+   - Verify the project runs with `npm run dev`
+   - Remove or simplify default boilerplate that is not needed
+
+2. Install and configure Tailwind CSS
+   - Use the official Nuxt + Tailwind integration
+   - Ensure Tailwind utilities work in templates
+   - Add a minimal global style baseline if needed
+
+3. Establish project structure and conventions
+   - Create the following empty directories:
+     - /server/api
+     - /lib/api-client
+     - /lib/types
+     - /composables
+   - Do not add placeholder files unless required by Nuxt
+   - Keep naming consistent and predictable
+
+4. Create a minimal Home page placeholder
+   - Simple page confirming the app renders correctly
+   - Use a few Tailwind classes to prove styling works
+   - No layout complexity
+
+5. Verify developer experience
+   - Ensure there are no TypeScript errors
+   - Ensure linting/build passes if configured
+   - Keep configuration readable and minimal
+
+Output expectations:
+- Explain each change briefly before making it
+- Make small, incremental edits
+- Do not jump ahead to future phases
+- If something is optional, call it out instead of assuming
+
+After finishing:
+- Summarize what was done
+- Explicitly state that Phase 0 is complete and ready for Phase 1
+
+
+prefer pnpm over npm
+
+---
+
+**Cursor**
+
+Plan updated for pnpm (`pnpm dlx nuxi init`, `pnpm install`, `pnpm dev`).  
+Reply “start” when ready to execute.
+
+---
+
+**User**
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+**Cursor**
+
+Scaffold done, Tailwind + ESLint wired, placeholder added; dev server booted, lint clean.
+
+Changes (minimal, atomic)
+- Initialized Nuxt 4 minimal app at workspace root.
+- Added Tailwind module + global CSS entry in `nuxt.config.ts`; created `assets/css/main.css`.
+- Added ESLint module and minimal `eslint.config.mjs`; added `lint` script in `package.json`.
+- Created empty dirs: `server/api`, `lib/api-client`, `lib/types`, `composables`.
+- Replaced `app/app.vue` with minimal Tailwind-styled placeholder.
+
+Verification
+- `pnpm dev` starts OK (then stopped).
+- `pnpm lint` passes.
+- IDE warnings for `@tailwind` in CSS are expected without Tailwind-aware CSS linting.
+
+Phase 0 complete and ready for Phase 1.
+
+If you want anything else (e.g. add Tailwind-aware CSS linting), say so.
+
+---
+
+**User**
+
+resolve the following error
+
+Cannot find module '~/assets/css/main.css' imported from 'virtual:nuxt:%2Fhome%2Fdonirk%2FCode%2Frandom-profiles%2F.nuxt%2Fcss.mjs'. - If you rely on tsconfig.json's "paths" to resolve modules, please install "vite-tsconfig-paths" plugin to handle module resolution. - Make sure you don't have relative aliases in your Vitest config. Use absolute paths instead. Read more: https://vitest.dev/guide/common-errors
+
+---
+
+**Cursor**
+
+Moved Tailwind CSS file into `app/assets/css/main.css` so `~/assets/...` resolves in Nuxt 4 app dir. That error should be gone.
+
+Run `pnpm dev` again to confirm.
+
