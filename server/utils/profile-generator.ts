@@ -1,7 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { ProfileSchema, type Profile } from "~~/lib/types/profile-schema";
-import { AVATAR_SIZE } from "#server/utils/constants";
 import { isNumber } from "#server/utils/type-guards";
+
+const AVATAR_SIZE = 256;
 
 type ProfileGeneratorOptions = {
   id?: string;
