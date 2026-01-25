@@ -1,4 +1,3 @@
-import { defineEventHandler } from "h3";
 import { getProfileCatalog } from "#server/utils/profile-catalog";
 import {
   buildErrorResponse,
@@ -6,6 +5,7 @@ import {
   parseQueryParam,
 } from "#server/utils/profile-query-validation";
 import { searchProfiles } from "#server/utils/profile-search";
+import { setStatus } from "#server/utils/response-status";
 
 const DEFAULT_COUNT = 10;
 
@@ -14,15 +14,6 @@ type ValidationResult<TValue> =
   | { ok: true; value: TValue }
   | { ok: false; error: { code: string; message: string } };
 type ValidatedQueryParams = { count: number; query?: string };
-
-const setStatus = (
-  event: { res: { status?: number; statusText?: string } },
-  status: number,
-  statusText: string,
-) => {
-  event.res.status = status;
-  event.res.statusText = statusText;
-};
 
 const getQueryParams = (event: { req: { url: string }; url?: URL }): QueryParams => {
   const url = event.url ?? new URL(event.req.url, "http://localhost");
