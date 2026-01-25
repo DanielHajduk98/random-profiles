@@ -3578,3 +3578,211 @@ If you want next, I can:
 * Write the **follow-up Swagger prompt** that documents this behavior cleanly
 * Help you design **weighted fuzzy scoring** that stays simple
 * Review your eventual implementation from a **hiring-manager lens**
+
+---
+# User
+
+ok, let's wait with swagger for now. Prepare a prompt for the second endpoint.
+
+---
+# GPT
+
+Great, this endpoint is much simpler now that we’ve committed to the **pre-generated catalog**.
+Below is a **clean, scoped Cursor prompt** for **GET /api/profile/:id**, aligned with the in-memory catalog approach and realistic app behavior.
+
+You can paste this directly into Cursor.
+
+---
+
+```
+You are a senior backend-leaning frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- An in-memory catalog of 2000 profiles already exists
+- GET /api/profiles endpoint is implemented using this catalog
+- Shared Profile Zod schema exists
+- This ticket implements the profile details endpoint
+
+Goal:
+Implement GET /api/profile/:id endpoint that returns details for a single profile
+from the pre-generated in-memory catalog.
+
+Constraints:
+- Do NOT add Swagger or API documentation
+- Do NOT modify catalog generation logic
+- Do NOT regenerate profiles
+- Do NOT add client-side code
+- Reuse existing catalog module and Profile schema
+- Keep logic minimal and predictable
+
+Tasks to perform (in order):
+
+1. Implement API endpoint
+   - Create `/server/api/profile/[id].get.ts`
+   - Read `id` from route parameters
+   - Retrieve the profile catalog from the existing catalog module
+   - Look up the profile by id
+
+2. Handle lookup behavior
+   - If a matching profile is found:
+     - Return it as JSON
+   - If no profile matches the id:
+     - Return a 404 response
+     - Include a clear error message
+
+3. Validate response
+   - Ensure the returned profile conforms to the Profile Zod schema
+   - Do not revalidate the entire catalog
+   - Fail fast if the profile data is invalid
+
+4. Error handling
+   - Handle missing or invalid id parameters
+   - Return appropriate HTTP status codes
+   - Return errors in a consistent JSON format
+   - Do not expose stack traces
+
+5. Unit tests
+   - Add unit tests for GET /api/profile/:id
+   - Cover:
+     - Valid id returns correct profile
+     - Invalid id returns 404
+     - Missing id handling (if applicable)
+     - Deterministic behavior (same id always returns same profile)
+   - Assert:
+     - HTTP status codes
+     - Response shape
+     - Schema compliance
+
+Output expectations:
+- Explain which files you will add or modify before coding
+- Keep endpoint logic small and readable
+- Reuse catalog access logic, do not duplicate it
+- Keep tests deterministic and isolated
+- Ensure all tests pass
+
+After finishing:
+- Summarize endpoint behavior
+- Summarize test coverage
+- Explicitly state that this ticket is complete and ready for client consumption
+```
+
+---
+
+### Why this works well
+
+* Fully aligned with the **catalog-based architecture**
+* Zero duplication of generation logic
+* Behaves exactly like a real backend details endpoint
+* Very easy to reason about and test
+* Reviewers immediately understand the flow
+
+If you want next, I can:
+
+* Help you design **client-side consumption** for this endpoint
+* Write the **Cursor prompt for the API client module**
+* Or help you decide when Swagger adds the most value
+
+---
+
+# User
+I'm putting swagger for later. lets start with next steps. "Create typed API client module"
+
+---
+# GPT
+
+Perfect timing. This is the right next step now that both endpoints are defined.
+
+Below is a **Cursor-ready prompt** for the **“Create typed API client module”** ticket, aligned with Nuxt 4 best practices, your catalog-based API, and future client usage.
+
+You can paste this directly into Cursor.
+
+---
+
+```
+You are a senior frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Server API endpoints already exist:
+  - GET /api/profiles
+  - GET /api/profile/:id
+- Shared Profile Zod schema exists
+- This ticket introduces the client-side API abstraction
+
+Goal:
+Create a small, typed API client module that is the ONLY place in the client layer
+responsible for calling server API endpoints.
+
+Constraints:
+- Do NOT add UI components or pages
+- Do NOT call the API directly from pages or composables
+- Do NOT introduce state management (Pinia, etc.)
+- Keep the module minimal and explicit
+- Reuse existing types and schemas
+
+Tasks to perform (in order):
+
+1. Create API client module
+   - Place the module in `/lib/api-client`
+   - Export clearly named functions:
+     - `getProfiles(params)`
+     - `getProfileById(id)`
+   - Use Nuxt’s `$fetch` or `useFetch` where appropriate
+   - Keep the API surface small and intentional
+
+2. Typing and validation
+   - Type all request parameters explicitly
+   - Use the shared Profile TypeScript type for responses
+   - Optionally validate responses using the Zod schema
+   - Ensure types are usable in both client and server contexts if needed
+
+3. Error handling
+   - Normalize API errors into a predictable shape
+   - Avoid leaking raw fetch errors to consumers
+   - Ensure calling code can distinguish:
+     - network errors
+     - not-found errors
+     - validation errors
+
+4. API client ergonomics
+   - Make the API easy to consume from pages
+   - Avoid over-abstraction
+   - Prefer explicit parameters over generic objects where possible
+
+5. Unit tests (if applicable)
+   - Add unit tests for the API client functions
+   - Mock network calls
+   - Verify typing and error handling behavior
+
+Output expectations:
+- Explain which files you will add or modify before coding
+- Keep the module small and readable
+- Avoid unused helpers or premature abstractions
+- Ensure TypeScript compiles without errors
+
+After finishing:
+- Summarize available client API functions
+- Explain how errors are handled
+- Explicitly state that this module is ready to be used by pages
+```
+
+---
+
+### Design notes (for you, not Cursor)
+
+This ticket is a **big signal to reviewers**:
+
+* Shows architectural discipline
+* Makes future refactors easy
+* Proves you understand client/server boundaries in Nuxt
+
+If you want next, I can:
+
+* Write the **Cursor prompt for the Home page**
+* Help you decide whether to use `$fetch` vs `useFetch`
+* Review the API client design from a **DX perspective**
