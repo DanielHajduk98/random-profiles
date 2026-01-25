@@ -3786,3 +3786,215 @@ If you want next, I can:
 * Write the **Cursor prompt for the Home page**
 * Help you decide whether to use `$fetch` vs `useFetch`
 * Review the API client design from a **DX perspective**
+
+---
+# User
+
+knowing the context, analyze whether we should use $fetch or useFetch in the api client module
+
+---
+# GPT
+This is a **very good architectural question**, and there is a *correct* answer given your context.
+
+Short answer first, then the reasoning:
+
+> **Use `$fetch` in the API client module.
+> Do NOT use `useFetch`.**
+
+Now let’s unpack why, based on *your exact setup*.
+
+---
+
+## What `$fetch` and `useFetch` are really for
+
+### `$fetch`
+
+* Thin wrapper around `ofetch`
+* Promise-based
+* Works in:
+
+  * server
+  * client
+  * tests
+* No Vue reactivity
+* No Nuxt lifecycle coupling
+
+### `useFetch`
+
+* Vue/Nuxt composable
+* Reactive
+* Tied to:
+
+  * component lifecycle
+  * SSR hydration
+  * refs, pending states, etc.
+* Meant to be used **inside components or composables**
+
+---
+
+## Your API client module requirements
+
+Let’s map your constraints to the tools.
+
+### Your API client must:
+
+* Live in `/lib/api-client`
+* Be framework-agnostic
+* Be callable from:
+
+  * pages
+  * composables
+  * possibly server code
+* Be unit-testable
+* Be the *only* place calling the API
+* Not impose UI concerns (loading, refs, reactivity)
+
+This already rules out `useFetch`.
+
+---
+
+## Why `useFetch` is the wrong tool here
+
+### 1. It couples your API client to Vue
+
+`useFetch`:
+
+* Returns refs
+* Assumes component lifecycle
+* Assumes SSR context
+
+That makes your API client:
+
+* Harder to test
+* Harder to reuse
+* Harder to reason about
+
+You end up with UI concerns leaking into data access.
+
+---
+
+### 2. You already plan to handle loading/errors at page level
+
+Your design explicitly says:
+
+* API client fetches data
+* Pages manage loading and error states
+
+`useFetch` **already does loading/error**, but:
+
+* In a very specific way
+* With opinions you don’t control
+
+This leads to duplicated or conflicting logic.
+
+---
+
+### 3. It breaks the “single responsibility” rule
+
+Your API client should:
+
+> Fetch data and return typed results or throw typed errors.
+
+`useFetch` does much more than that.
+
+---
+
+## Why `$fetch` fits perfectly
+
+### 1. Clean contract
+
+```ts
+const profiles = await getProfiles({ q, count })
+```
+
+* Returns data
+* Throws on error
+* Fully typed
+* Easy to mock
+
+Exactly what you want.
+
+---
+
+### 2. Works everywhere
+
+You can safely call `$fetch`:
+
+* From pages
+* From server code
+* From tests
+
+No special setup required.
+
+---
+
+### 3. Matches Nuxt best practices
+
+Nuxt itself recommends:
+
+* `useFetch` for **components**
+* `$fetch` for **services / utilities**
+
+Your API client is a service.
+
+---
+
+## How this affects page implementation (important)
+
+Your pages should look like this:
+
+```ts
+const loading = ref(true)
+const error = ref(null)
+
+try {
+  profiles.value = await api.getProfiles(...)
+} catch (e) {
+  error.value = e
+} finally {
+  loading.value = false
+}
+```
+
+That’s explicit, readable, and reviewer-friendly.
+
+---
+
+## When `useFetch` *would* be correct
+
+Just for completeness:
+
+Use `useFetch` when:
+
+* Fetching directly inside a page
+* You want SSR hydration
+* You want Nuxt-managed reactivity
+
+But **you explicitly decided not to fetch directly from pages**.
+So this doesn’t apply.
+
+---
+
+## Final recommendation
+
+**API client module**
+
+* Use `$fetch`
+* Promise-based
+* Typed
+* No reactivity
+
+**Pages / composables**
+
+* Consume API client
+* Manage loading and error states explicitly
+
+This is the cleanest possible architecture for your project.
+
+---
+
+If you want next, I can:
+
+* Propose the **exact API client function signatures**
+* Review how to mock `$fetch` cleanly in tests
+* Help you write the **Cursor prompt update** enforcing `$fetch` usage
