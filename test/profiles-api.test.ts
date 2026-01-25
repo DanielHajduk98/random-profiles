@@ -15,6 +15,21 @@ const runHandler = async (url: string) => {
   return { event, response };
 };
 
+const expectHttpError = (
+  action: () => unknown,
+  statusCode: number,
+  statusMessage: string,
+) => {
+  try {
+    action();
+  } catch (error) {
+    expect(error).toMatchObject({ statusCode, statusMessage });
+    return;
+  }
+
+  throw new Error("Expected handler to throw an HTTPError");
+};
+
 describe("GET /api/profiles", () => {
   it("initializes and caches the catalog", () => {
     const first = getProfileCatalog();
@@ -25,11 +40,10 @@ describe("GET /api/profiles", () => {
   });
 
   it("returns default count with no query", async () => {
-    const { event, response } = await runHandler(
+    const { response } = await runHandler(
       "http://localhost/api/profiles",
     );
 
-    expect(event.res.status).toBe(200);
     expect(Array.isArray(response)).toBe(true);
     expect(response).toHaveLength(10);
     expect(ProfileSchema.array().safeParse(response).success).toBe(true);
@@ -73,54 +87,42 @@ describe("GET /api/profiles", () => {
   });
 
   it("returns 400 for invalid count", async () => {
-    const { event, response } = await runHandler(
-      "http://localhost/api/profiles?count=abc",
-    );
+    const event = mockEvent("http://localhost/api/profiles?count=abc");
 
-    expect(event.res.status).toBe(400);
-    expect(response).toMatchObject({
-      error: {
-        code: "INVALID_COUNT",
-      },
-    });
+    expectHttpError(
+      () => handler(event),
+      400,
+      "count must be a positive integer",
+    );
   });
 
   it("returns 400 for negative count", async () => {
-    const { event, response } = await runHandler(
-      "http://localhost/api/profiles?count=-1",
-    );
+    const event = mockEvent("http://localhost/api/profiles?count=-1");
 
-    expect(event.res.status).toBe(400);
-    expect(response).toMatchObject({
-      error: {
-        code: "INVALID_COUNT",
-      },
-    });
+    expectHttpError(
+      () => handler(event),
+      400,
+      "count must be a positive integer",
+    );
   });
 
   it("returns 400 for repeated query param", async () => {
-    const { event, response } = await runHandler(
-      "http://localhost/api/profiles?q=one&q=two",
-    );
+    const event = mockEvent("http://localhost/api/profiles?q=one&q=two");
 
-    expect(event.res.status).toBe(400);
-    expect(response).toMatchObject({
-      error: {
-        code: "REPEATED_QUERY_PARAM",
-      },
-    });
+    expectHttpError(
+      () => handler(event),
+      400,
+      "Param must be provided once",
+    );
   });
 
   it("returns 400 for repeated count param", async () => {
-    const { event, response } = await runHandler(
-      "http://localhost/api/profiles?count=5&count=6",
-    );
+    const event = mockEvent("http://localhost/api/profiles?count=5&count=6");
 
-    expect(event.res.status).toBe(400);
-    expect(response).toMatchObject({
-      error: {
-        code: "REPEATED_COUNT_PARAM",
-      },
-    });
+    expectHttpError(
+      () => handler(event),
+      400,
+      "Param must be provided once",
+    );
   });
 });

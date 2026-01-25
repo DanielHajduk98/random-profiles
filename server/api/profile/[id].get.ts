@@ -1,8 +1,6 @@
-import { eventHandler } from "h3";
+import { createError, defineEventHandler } from "h3";
 import { ProfileSchema } from "~~/lib/types/profile-schema";
 import { getProfileCatalog } from "#server/utils/profile-catalog";
-import { buildErrorResponse } from "#server/utils/profile-query-validation";
-import { setStatus } from "#server/utils/response-status";
 
 const getProfileId = (event: { context: { params?: Record<string, string> } }) => {
   const id = event.context.params?.id;
@@ -14,38 +12,32 @@ const getProfileId = (event: { context: { params?: Record<string, string> } }) =
   return id;
 };
 
-export default eventHandler((event) => {
+export default defineEventHandler((event) => {
   const id = getProfileId(event);
   if (!id) {
-    setStatus(event, 404, "Not Found");
-    return buildErrorResponse("PROFILE_NOT_FOUND", "Profile not found");
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+    });
   }
 
-  try {
-    const catalog = getProfileCatalog();
-    const profile = catalog.find((item) => item.id === id);
+	const catalog = getProfileCatalog();
+	const profile = catalog.find((item) => item.id === id);
 
-    if (!profile) {
-      setStatus(event, 404, "Not Found");
-      return buildErrorResponse("PROFILE_NOT_FOUND", "Profile not found");
-    }
+	if (!profile) {
+		throw createError({
+			statusCode: 404,
+			statusMessage: "Not Found",
+		});
+	}
 
-    const validation = ProfileSchema.safeParse(profile);
-    if (!validation.success) {
-      setStatus(event, 500, "Internal Server Error");
-      return buildErrorResponse(
-        "INTERNAL_ERROR",
-        "Unexpected error while loading profile",
-      );
-    }
+	const validation = ProfileSchema.safeParse(profile);
+	if (!validation.success) {
+		throw createError({
+			statusCode: 500,
+			statusMessage: "Internal Server Error",
+		});
+	}
 
-    setStatus(event, 200, "OK");
-    return validation.data;
-  } catch (error) {
-    setStatus(event, 500, "Internal Server Error");
-    return buildErrorResponse(
-      "INTERNAL_ERROR",
-      "Unexpected error while loading profile",
-    );
-  }
+	return validation.data;
 });
