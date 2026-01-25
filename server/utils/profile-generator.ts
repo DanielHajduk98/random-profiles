@@ -64,7 +64,7 @@ export const generateProfile = (
     company: faker.company.name(),
     phone,
     address: faker.location.streetAddress(),
-    bio: faker.lorem.sentences({ min: 1, max: 2 }),
+    bio: faker.person.bio(),
   };
 
   return ProfileSchema.parse(profile);

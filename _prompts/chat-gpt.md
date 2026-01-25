@@ -3998,3 +3998,517 @@ If you want next, I can:
 * Propose the **exact API client function signatures**
 * Review how to mock `$fetch` cleanly in tests
 * Help you write the **Cursor prompt update** enforcing `$fetch` usage
+
+---
+# User
+Create a prompt for the next ticket:
+Implement Home page (profiles gallery)
+
+Implement Home page (profiles gallery)
+
+### Goal
+Display a gallery of random profiles.
+
+### Tasks
+- [ ] Fetch profiles via API client
+- [ ] Render profile cards
+- [ ] Create responsive grid layout
+
+### Acceptance criteria
+- Uses local API only
+- Layout works on mobile and desktop
+
+----
+Tech: Focus on using tailwind for styling
+
+Let's discuss the design considerations and logic:
+* the homepage should display profiles in cards, one near another. Each row should display 4 profiles on desktop, and a single one on mobile.
+* Each card should contain have layout like this, top to bottom:
+- avatar
+- name and surname
+- bio
+No more information is necessary to display since we also will make details page.
+* color scheme should be purple, background should be a linear-gradient bottom left should be black which slowly changes to dark purple.
+* Page should have a header - which we will later use for a search bar.
+* Add a hover state on profile card which makes it slightly larger and adds a highlight around the card.
+Write additional questions and consider other options. Write an initial prompt to cursor and in addition describe the prompt for figma make.
+
+---
+# GPT
+
+Nice, this is a good moment to slow down a bit and think like a product engineer, not just “implementer”. I’ll break this into four parts:
+
+1. Design + logic considerations (and tradeoffs)
+2. Additional questions worth answering now
+3. Cursor prompt for implementation
+4. Figma Make prompt for visual exploration
+
+I’ll keep it practical and honest.
+
+---
+
+## 1. Design and logic considerations
+
+### Data & rendering logic
+
+* **Data source**
+
+  * Use the typed API client only
+  * Call `getProfiles({ count })` on page load
+  * No SSR complexity needed initially unless explicitly required later
+
+* **How many profiles to show**
+
+  * Pick a fixed number (e.g. 20 or 24)
+  * Important for layout consistency and perceived performance
+  * Make this a constant at the top of the page
+
+* **Loading & error states**
+
+  * Even if not in acceptance criteria, add:
+
+    * a simple loading state (skeleton or text)
+    * a basic error message
+  * This makes the page feel “real” and avoids awkward blank screens
+
+---
+
+### Layout & responsiveness
+
+* **Grid**
+
+  * Desktop: 4 columns
+  * Tablet: 2 columns (optional but recommended)
+  * Mobile: 1 column
+
+Tailwind example direction:
+
+* `grid-cols-1`
+* `md:grid-cols-2`
+* `lg:grid-cols-4`
+
+This gives a natural progression.
+
+* **Spacing**
+
+  * Cards need enough gap so hover scale does not collide visually
+  * Use `gap-6` or `gap-8`
+
+---
+
+### Card content hierarchy
+
+You made a good call by limiting information.
+
+Each card should:
+
+1. Avatar (visual anchor)
+2. Name (strong typography)
+3. Bio (muted, line-clamped)
+
+Important considerations:
+
+* Clamp bio to 2–3 lines
+* Avoid cards with wildly different heights
+* Avatar should be circular or softly rounded
+
+---
+
+### Hover interaction
+
+Hover state should:
+
+* Scale slightly (`scale-105` or `scale-[1.03]`)
+* Add subtle glow or border highlight in purple
+* Transition smoothly (`transition-all`, `duration-200`)
+
+Avoid:
+
+* Heavy shadows
+* Large jumps (feels cheap)
+
+This is about polish, not drama.
+
+---
+
+### Color scheme & background
+
+Your background choice is strong but easy to overdo.
+
+Suggestions:
+
+* Page background: gradient from black → deep purple
+* Cards:
+
+  * Slightly lighter dark surface
+  * Semi-transparent (`bg-white/5` or `bg-purple-900/20`)
+* Text:
+
+  * Names: near-white
+  * Bio: muted gray-purple
+
+This keeps contrast readable.
+
+---
+
+### Header
+
+Even if search comes later:
+
+* Add a header container
+* Give it height and padding
+* Centered title or placeholder text
+
+This avoids refactoring layout later.
+
+---
+
+## 2. Additional questions worth deciding now
+
+You don’t have to answer all immediately, but thinking about them helps Cursor make better decisions.
+
+1. Should cards be clickable now?
+
+   * Even if details page isn’t implemented yet
+   * Could wrap card in a `<NuxtLink>` with placeholder href
+
+2. Should avatars have a fallback?
+
+   * Broken image handling
+   * Initials fallback or default gradient
+
+3. Should layout be constrained?
+
+   * Full-width vs max-width container
+   * Usually `max-w-7xl mx-auto` feels more “product-y”
+
+4. Should we animate on initial load?
+
+   * Fade-in or stagger
+   * Optional, but can be deferred
+
+5. Should we support keyboard focus styles?
+
+   * Not required, but easy to add if cards are links
+
+You can tell Cursor to keep these extensible without implementing everything.
+
+---
+
+## 3. Cursor prompt (implementation)
+
+You can paste this directly.
+
+```
+You are a senior frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Tailwind CSS is available
+- Typed API client exists
+- GET /api/profiles endpoint is implemented
+- This ticket implements the Home page (profiles gallery)
+
+Goal:
+Implement the Home page that displays a responsive gallery of profile cards.
+
+Constraints:
+- Use the local API only via the API client
+- Do NOT call $fetch or useFetch directly in the page
+- Use Tailwind CSS for all styling
+- No search functionality yet (header is a placeholder)
+- Keep code clean and easy to extend
+
+Tasks to perform (in order):
+
+1. Create Home page
+   - Implement the Home page (index route)
+   - Fetch profiles using the API client
+   - Use a fixed number of profiles (e.g. 20–24)
+
+2. Data handling
+   - Handle loading state
+   - Handle error state gracefully
+   - Store profiles in local component state
+
+3. Layout
+   - Page background:
+     - Linear gradient
+     - Bottom-left black transitioning to dark purple
+   - Add a header section at the top:
+     - Reserved space for future search bar
+     - Simple placeholder content for now
+   - Constrain content width using a centered container
+
+4. Profiles grid
+   - Render profiles in a grid:
+     - Mobile: 1 column
+     - Desktop: 4 columns
+   - Use adequate spacing between cards
+   - Ensure layout works well on mobile and desktop
+
+5. Profile card component
+   - Create a reusable ProfileCard component
+   - Card layout (top to bottom):
+     - Avatar image
+     - Name and surname
+     - Bio (line-clamped)
+   - No additional fields displayed
+
+6. Styling & interactions
+   - Use a dark, purple-themed color palette
+   - Cards should:
+     - Have a subtle dark surface
+     - Be visually separated from the background
+   - Add hover state:
+     - Slight scale up
+     - Subtle purple highlight or glow
+     - Smooth transition
+
+7. Code quality
+   - Keep components small and readable
+   - Avoid inline styles
+   - Use Tailwind utility classes consistently
+   - Ensure TypeScript types are correct
+
+Output expectations:
+- Explain which files/components you will create before coding
+- Keep styling tasteful and restrained
+- Ensure the page works on mobile and desktop
+- Ensure no direct API calls outside the API client
+
+After finishing:
+- Summarize layout decisions
+- Confirm responsiveness
+- Confirm that the page is ready for adding search and navigation later
+```
+
+---
+
+## 4. Figma Make prompt
+
+This is intentionally more visual and less technical.
+
+```
+Design a dark-themed profiles gallery page for a web app.
+
+Page background:
+- Linear gradient
+- Bottom-left: black
+- Gradually transitions to dark purple
+
+Layout:
+- Centered content container
+- Header at the top with space reserved for a future search bar
+- Below the header, a grid of profile cards
+
+Grid behavior:
+- Desktop: 4 cards per row
+- Mobile: 1 card per row
+- Even spacing between cards
+
+Profile card design:
+- Dark surface with subtle contrast from background
+- Slightly rounded corners
+- Soft shadow or glow
+- On hover:
+  - Card slightly scales up
+  - Purple highlight or glow appears
+
+Card content (top to bottom):
+- Circular avatar image
+- Full name (prominent)
+- Short bio text (muted, secondary)
+
+Overall style:
+- Modern
+- Clean
+- Minimal
+- Purple-accented
+- Feels like a real product, not a demo
+
+Avoid clutter and excessive decoration.
+```
+
+---
+
+If you want, next we can:
+
+* Tighten hover/glow effects so they don’t feel “Tailwind-default”
+* Decide whether cards should already link to the details page
+* Or prep the **details page prompt** so both pages feel cohesive
+
+---
+# User
+answering your questions:
+1. let's wrap them right away in nuxtlink with placeholder href
+2. initials fallback
+3. max-w-7xl mx-auto
+4. quick fade-in
+5. yes
+
+---
+# GPT
+
+Perfect - those answers remove all ambiguity. This lets us tighten the implementation prompt and avoid rework later. I’ll do two things:
+
+1. Reflect your decisions and note the implications
+2. Provide an **updated, final Cursor prompt** incorporating them cleanly
+
+---
+
+## 1. Implications of your decisions (quick sanity check)
+
+You made solid, product-minded calls.
+
+### 1. Cards wrapped in `NuxtLink`
+
+* Good: navigation model is established early
+* Placeholder `to` keeps routing flexible
+* Enables keyboard focus styles naturally
+
+### 2. Initials fallback for avatar
+
+* Avoids broken-image ugliness
+* Makes cards resilient
+* Easy to reuse on details page
+
+### 3. `max-w-7xl mx-auto`
+
+* Prevents ultra-wide layouts from looking empty
+* Feels production-grade
+* Works nicely with 4-column grid
+
+### 4. Quick fade-in
+
+* Subtle polish
+* No heavy animation library needed
+* Should be short (150–250ms)
+
+### 5. Keyboard focus styles
+
+* Good accessibility signal
+* Free benefit from using links
+* Easy to style with Tailwind
+
+Nothing here adds risky complexity.
+
+---
+
+## 2. Updated Cursor prompt (final version)
+
+Paste this into Cursor instead of the previous Home page prompt.
+
+```
+You are a senior frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Tailwind CSS is available
+- Typed API client exists
+- GET /api/profiles endpoint is implemented
+- This ticket implements the Home page (profiles gallery)
+
+Goal:
+Implement the Home page that displays a responsive gallery of profile cards.
+
+Constraints:
+- Use the local API only via the API client
+- Do NOT call $fetch or useFetch directly in the page
+- Use Tailwind CSS for all styling
+- No search functionality yet (header is a placeholder)
+- Keep code clean and easy to extend
+
+Tasks to perform (in order):
+
+1. Create Home page
+   - Implement the Home page (index route)
+   - Fetch profiles using the API client
+   - Use a fixed number of profiles (e.g. 20–24)
+   - Handle loading and error states
+
+2. Page layout
+   - Page background:
+     - Linear gradient
+     - Bottom-left black transitioning to dark purple
+   - Add a header section at the top:
+     - Reserved space for a future search bar
+     - Placeholder content only
+   - Constrain content width using:
+     - max-w-7xl mx-auto
+
+3. Profiles grid
+   - Render profiles in a grid:
+     - Mobile: 1 column
+     - Tablet: 2 columns (if appropriate)
+     - Desktop: 4 columns
+   - Use adequate spacing between cards to support hover scaling
+
+4. Profile card component
+   - Create a reusable ProfileCard component
+   - Entire card should be wrapped in NuxtLink
+     - Use a placeholder `to` value for now
+   - Card layout (top to bottom):
+     - Avatar
+     - Name and surname
+     - Bio
+   - Clamp bio text to avoid uneven card heights
+
+5. Avatar behavior
+   - Display avatar image when available
+   - If image fails or is missing:
+     - Show initials fallback
+     - Use a styled circular background
+
+6. Styling & interactions
+   - Use a dark, purple-based color scheme
+   - Cards should:
+     - Have a subtle dark surface
+     - Be visually separated from the background
+   - Hover and focus states:
+     - Slight scale up
+     - Subtle purple highlight or glow
+     - Smooth transition
+     - Visible focus styles for keyboard navigation
+
+7. Animation
+   - Add a quick fade-in animation for cards on initial render
+   - Keep animation subtle and short (no heavy motion)
+
+8. Code quality
+   - Keep components small and readable
+   - Avoid inline styles
+   - Use Tailwind utility classes consistently
+   - Ensure TypeScript types are correct
+
+Output expectations:
+- Explain which files/components you will create before coding
+- Ensure layout works on mobile and desktop
+- Ensure cards are accessible and keyboard-focusable
+- Ensure no direct API calls outside the API client
+
+After finishing:
+- Summarize layout and styling decisions
+- Confirm responsiveness and accessibility
+- Confirm the page is ready for adding search and navigation later
+```
+
+---
+
+At this point, your project has a very clear arc:
+
+* solid backend simulation
+* clean API boundary
+* product-feeling UI
+
+Next logical tickets after this would be:
+
+* Profile details page
+* Search bar integration
+* Query → URL synchronization
+
+Whenever you’re ready, we can line those up cleanly.
