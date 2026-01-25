@@ -1,79 +1,52 @@
-type QueryValidationResult<TValue> =
-  | { ok: true; value: TValue }
-  | { ok: false; error: { code: string; message: string } };
+import { createError } from "h3";
 
 const REPEATED_PARAM_ERROR = "Param must be provided once";
 
-export const buildErrorResponse = (code: string, message: string) => ({
-  error: {
-    code,
-    message,
-  },
-});
-
 const isRepeatedParam = (value: unknown): boolean => Array.isArray(value);
+
+const throwBadRequest = (message: string): never => {
+  throw createError({
+    statusCode: 400,
+    statusMessage: message,
+  });
+};
 
 export const parseCountParam = (
   value: unknown,
   defaultCount: number,
-): QueryValidationResult<number> => {
+): number => {
   if (value === undefined) {
-    return { ok: true, value: defaultCount };
+    return defaultCount;
   }
 
   if (isRepeatedParam(value)) {
-    return {
-      ok: false,
-      error: {
-        code: "REPEATED_COUNT_PARAM",
-        message: REPEATED_PARAM_ERROR,
-      },
-    };
+    throwBadRequest(REPEATED_PARAM_ERROR);
   }
 
   const parsed = Number(value);
 
   if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
-    return {
-      ok: false,
-      error: {
-        code: "INVALID_COUNT",
-        message: "count must be a positive integer",
-      },
-    };
+    throwBadRequest("count must be a positive integer");
   }
 
-  return { ok: true, value: parsed };
+  return parsed;
 };
 
 export const parseQueryParam = (
   value: unknown,
-): QueryValidationResult<string | undefined> => {
+): string | undefined => {
   if (value === undefined) {
-    return { ok: true, value: undefined };
+    return undefined;
   }
 
   if (isRepeatedParam(value)) {
-    return {
-      ok: false,
-      error: {
-        code: "REPEATED_QUERY_PARAM",
-        message: REPEATED_PARAM_ERROR,
-      },
-    };
+    throwBadRequest(REPEATED_PARAM_ERROR);
   }
 
-  if (typeof value !== "string") {
-    return {
-      ok: false,
-      error: {
-        code: "INVALID_QUERY",
-        message: "q must be a string",
-      },
-    };
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
   }
 
-  const trimmed = value.trim();
-
-  return { ok: true, value: trimmed.length > 0 ? trimmed : undefined };
+  throwBadRequest("q must be a string");
 };
