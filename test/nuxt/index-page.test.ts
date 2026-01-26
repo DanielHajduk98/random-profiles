@@ -98,7 +98,7 @@ describe("index page", () => {
 
     const status = wrapper.get('[role="status"]');
     expect(status.attributes("aria-live")).toBe("polite");
-    expect(status.element.children.length).toBe(8);
+    expect(status.element.children.length).toBe(16);
   });
 
   it("renders an error message for ApiClientError", async () => {
@@ -149,6 +149,10 @@ describe("index page", () => {
     expect(useHeadMock).toHaveBeenCalledWith({
       title: "Random Profiles Catalog",
       meta: [{ name: "description", content: "Random Profiles Catalog" }],
+      link: [
+        { rel: "preconnect", href: "https://testingbot.com" },
+        { rel: "dns-prefetch", href: "https://testingbot.com" },
+      ],
     });
   });
 });

@@ -9,17 +9,26 @@
     />
     <div class="flex flex-col items-center gap-3">
       <div
-        class="flex h-24 w-24 items-center justify-center rounded-full bg-purple-800/60 text-base font-semibold text-purple-100 shadow-inner shadow-purple-950/60"
+        class="relative flex h-24 w-24 items-center justify-center rounded-full bg-purple-800/60 text-base font-semibold text-purple-100 shadow-inner shadow-purple-950/60"
       >
         <img
           v-if="!imageError"
+          ref="imageRef"
           :src="profile.avatarUrl"
           :alt="`${profile.name} avatar`"
-          class="h-24 w-24 rounded-full object-cover"
+          class="absolute inset-0 h-24 w-24 rounded-full object-cover transition-opacity duration-200"
+          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
           loading="lazy"
+          @load="onImageLoad"
           @error="onImageError"
         >
-        <span v-else class="text-4xl" aria-hidden="true">{{ initials }}</span>
+        <span
+          v-if="!imageLoaded || imageError"
+          class="text-4xl"
+          aria-hidden="true"
+        >
+          {{ initials }}
+        </span>
       </div>
       <h3 class="text-lg font-semibold text-slate-100">
         {{ profile.name }}
@@ -33,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { type Profile } from "../../lib/types/profile-schema";
 
 type ProfileCardProps = {
@@ -42,6 +51,8 @@ type ProfileCardProps = {
 
 const props = defineProps<ProfileCardProps>();
 const imageError = ref(false);
+const imageLoaded = ref(false);
+const imageRef = ref<HTMLImageElement | null>(null);
 
 const initials = computed(() => {
   const parts = props.profile.name.split(" ").filter(Boolean);
@@ -57,5 +68,15 @@ const initials = computed(() => {
 const onImageError = () => {
   imageError.value = true;
 };
+
+const onImageLoad = () => {
+  imageLoaded.value = true;
+};
+
+onMounted(() => {
+  if (imageRef.value?.complete) {
+    imageLoaded.value = true;
+  }
+});
 </script>
   
