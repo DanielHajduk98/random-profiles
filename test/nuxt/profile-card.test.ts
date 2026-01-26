@@ -36,11 +36,13 @@ describe("profile-card", () => {
       props: { profile },
     });
 
+    const avatar = wrapper.find('[role="img"]');
     const image = wrapper.find("img");
     expect(image.exists()).toBe(true);
     expect(image.attributes("src")).toBe(profile.avatarUrl);
-    expect(image.attributes("alt")).toBe(`${profile.name} avatar`);
+    expect(image.attributes("alt")).toBe("");
     expect(image.attributes("loading")).toBe("lazy");
+    expect(avatar.attributes("aria-label")).toBe(`${profile.name} avatar`);
   });
 
   it("falls back to initials on image error", async () => {

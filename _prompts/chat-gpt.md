@@ -4512,3 +4512,495 @@ Next logical tickets after this would be:
 * Query → URL synchronization
 
 Whenever you’re ready, we can line those up cleanly.
+
+---
+# User
+
+ok, time to proceed with the details page. I would like to have this requirements:
+* Back button to previous page (so catalog or search)
+* Each detail of the profile should be described
+* Preferrably store the selected profile in runtime, to prevent refetch of the data
+* Use icons for each profile element.
+Here's a prompt from figma-make. Refine it if necessary. Ask followup questions if necessary
+```
+Create a dark-themed profiles gallery web application with routing and individual profile detail pages.
+Profile Detail Page:
+
+    Same gradient background
+    Centered content (same width as index page)
+    Back button with left arrow icon and hover animation
+    Profile header card with:
+        Larger circular avatar (w-32 h-32) with purple ring
+        Name as large heading
+        Bio in purple accent color
+        Two-column grid (responsive) displaying:
+            Left column: Job title, Company, Email, Phone
+            Right column: Age, Location, Address
+        Each field has:
+            Small label in muted gray (text-xs text-zinc-500)
+            Value in white text
+            Corresponding icon
+```
+
+---
+# GPT
+
+Great, this is a solid spec already. I’ll do this in four parts:
+
+1. Sanity check + design/logic implications
+2. A few **important follow-up questions** (there are some real tradeoffs here)
+3. Refined **Figma Make prompt**
+4. Initial **Cursor prompt** for implementation (based on current assumptions)
+
+I’ll keep it practical and honest.
+
+---
+
+## 1. Sanity check and implications
+
+### Back button
+
+* Back button should **preserve navigation context**
+
+  * If user came from catalog or search, `router.back()` is the right default
+  * Avoid hard-linking back to `/`
+* Add hover animation and keyboard focus state
+
+Good requirement.
+
+---
+
+### “Each detail of the profile should be described”
+
+Given your schema, this likely means:
+
+* id (maybe hidden, not displayed)
+* name
+* avatar
+* bio
+* age
+* jobTitle
+* company
+* email
+* phone
+* address
+
+That’s a good amount of content for a detail page, but:
+
+* Needs strong visual grouping
+* Two-column layout is the right choice
+
+---
+
+### Storing selected profile in runtime (important design choice)
+
+This is the most interesting part.
+
+There are **three realistic options**, and they have different tradeoffs:
+
+#### Option A - Runtime cache (recommended)
+
+* When clicking a card, store profile in a runtime store (Pinia or simple module-level cache)
+* Details page:
+
+  * First try runtime cache
+  * Fallback to API fetch by id
+
+Pros:
+
+* No refetch in normal flow
+* Page refresh still works
+* Realistic app behavior
+
+Cons:
+
+* Slightly more code
+
+This is the most “real app” solution.
+
+---
+
+#### Option B - Pass full profile via route state
+
+* Use router state or query params
+
+Pros:
+
+* No extra state management
+* Simple
+
+Cons:
+
+* Fragile
+* Page refresh breaks
+* Not production-like
+
+I would avoid this.
+
+---
+
+#### Option C - Always refetch by id
+
+Pros:
+
+* Simple
+  Cons:
+* You explicitly said you want to avoid this
+
+---
+
+### Icons per field
+
+Good call. A few considerations:
+
+* Use a consistent icon set (Heroicons, Lucide)
+* Icons should be muted, not dominant
+* Align icons with labels, not values
+
+---
+
+## 2. Follow-up questions (worth answering before implementation)
+
+These will affect the Cursor prompt quality.
+
+1. **State management**
+
+   * Are we OK introducing Pinia now?
+   * Or do you prefer a lightweight runtime cache module?
+
+2. **Direct navigation**
+
+   * Should `/profile/:id` work if user lands there directly?
+   * I strongly recommend yes (fallback fetch)
+
+3. **ID visibility**
+
+   * Should the profile ID be displayed anywhere?
+   * Usually no, but sometimes useful for debug
+
+4. **Mobile layout**
+
+   * On mobile:
+
+     * Stack fields in one column?
+     * Keep header card sticky?
+
+5. **Avatar fallback**
+
+   * Same initials fallback as cards?
+   * With larger size?
+
+You can answer briefly, even “default is fine”.
+
+---
+
+## 3. Refined Figma Make prompt
+
+I’ve refined your prompt slightly for clarity and consistency, without changing intent.
+
+```
+Design a dark-themed profile detail page for a profiles catalog web application.
+
+General layout:
+- Same background as the home page:
+  - Linear gradient from black (bottom-left) to dark purple
+- Centered content container
+  - Same max width as the home page
+- Clean, modern, product-like aesthetic
+
+Header:
+- Back button at the top:
+  - Left arrow icon
+  - Subtle hover animation (slide or fade)
+  - Visible focus state
+- Button should feel lightweight and non-intrusive
+
+Profile header card:
+- Dark surface card with subtle contrast
+- Centered or left-aligned layout
+- Large circular avatar:
+  - Size: approx. w-32 h-32
+  - Purple ring or outline
+  - Initials fallback if image missing
+- Name displayed as large heading
+- Bio displayed below name
+  - Purple accent color
+  - Short and readable
+
+Profile details section:
+- Two-column grid (responsive):
+  - Desktop: two columns
+  - Mobile: single column
+- Left column fields:
+  - Job title
+  - Company
+  - Email
+  - Phone
+- Right column fields:
+  - Age
+  - Location
+  - Address
+
+Each field:
+- Displayed as a row with:
+  - Icon (muted purple or gray)
+  - Label (text-xs, muted gray)
+  - Value (white or near-white text)
+- Clear vertical spacing between fields
+- Consistent alignment across rows
+
+Overall style:
+- Purple-accented
+- Minimal
+- Clean
+- Avoid visual clutter
+- Feels like a real product profile page
+```
+
+---
+
+## 4. Initial Cursor prompt (assuming reasonable defaults)
+
+This assumes:
+
+* Runtime cache with fallback fetch
+* Mobile stacks to one column
+* Avatar fallback reused
+
+You can paste this now, or we can tweak after you answer the questions.
+
+```
+You are a senior frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Tailwind CSS is available
+- Typed API client exists
+- Profile catalog and profile detail API endpoints exist
+- Home page with profile cards is implemented
+
+Goal:
+Implement the Profile Details page that displays full information about a single profile.
+
+Constraints:
+- Use local API only via the API client
+- Avoid unnecessary refetching when possible
+- Reuse existing components and styles
+- Use Tailwind CSS for styling
+- Ensure page works when accessed directly via URL
+
+Tasks to perform (in order):
+
+1. Routing
+   - Implement a dynamic route for profile details
+   - Extract profile id from route params
+
+2. Profile data handling
+   - Attempt to retrieve selected profile from runtime state/cache
+   - If not available, fetch profile by id using API client
+   - Handle loading and error states gracefully
+
+3. Page layout
+   - Use the same background and width constraints as the Home page
+   - Add a back button at the top:
+     - Uses router.back()
+     - Includes icon, hover, and focus states
+
+4. Profile header section
+   - Display large avatar with initials fallback
+   - Show name as prominent heading
+   - Show bio with purple accent styling
+
+5. Profile details section
+   - Render all remaining profile fields
+   - Use a responsive two-column grid:
+     - Desktop: two columns
+     - Mobile: one column
+   - Each field should include:
+     - Icon
+     - Label (muted)
+     - Value (primary text)
+
+6. Styling & interactions
+   - Maintain dark, purple-based theme
+   - Use consistent spacing and alignment
+   - Ensure accessibility (focus states, readable contrast)
+
+7. Code quality
+   - Keep logic readable and well-organized
+   - Avoid duplication between Home and Details page
+   - Ensure TypeScript types are respected
+
+Output expectations:
+- Explain which files/components you will add or modify before coding
+- Ensure navigation feels natural
+- Ensure direct URL access works
+- Ensure page is responsive and polished
+
+After finishing:
+- Summarize data flow decisions
+- Confirm refetch avoidance strategy
+- Confirm readiness for future enhancements
+```
+
+---
+
+Next step:
+If you answer the follow-up questions (especially about **Pinia vs lightweight cache**), I’ll tighten this prompt to be *exactly* right and avoid refactors later.
+
+---
+# User
+
+1. let's add pinia
+2. yes, there should be a fallback fetch
+3. id should be hidden on UI and visible only on the url
+4. one column. Don't keep header sticky
+5. yes. Possibly reuse the component from profile card.
+
+let's use Lucide icons
+
+Update the cursor prompt, figma-make prompt is unnecessary
+
+---
+# GPT
+
+Perfect, those answers lock the design in cleanly. Below is a **fully updated, final Cursor prompt** that incorporates *all* your decisions, removes ambiguity, and guides Cursor toward a production-grade implementation.
+
+You can paste this directly into Cursor.
+
+---
+
+```
+You are a senior frontend engineer continuing a Nuxt 4 project.
+
+Context:
+- Project: Random Profiles Catalog App
+- Framework: Nuxt 4
+- Language: TypeScript
+- Tailwind CSS is available
+- Lucide icons are used for UI icons
+- Typed API client exists
+- Profile catalog and profile detail API endpoints exist
+- Home page with profile cards is implemented
+- Pinia is available for state management
+
+Goal:
+Implement the Profile Details page that displays full information about a single profile,
+with navigation, caching, and graceful fallback fetching.
+
+Constraints:
+- Use the local API only via the API client
+- Use Pinia to store the selected profile at runtime
+- Avoid unnecessary refetching when possible
+- Ensure direct URL access works (fallback fetch)
+- Use Tailwind CSS for styling
+- Do NOT display profile id in the UI (id is URL-only)
+
+Tasks to perform (in order):
+
+1. Pinia store
+   - Create a Pinia store responsible for:
+     - Storing the currently selected profile
+     - Exposing getters to retrieve it by id
+     - Allowing the profile to be set when navigating from the Home page
+   - The store should:
+     - Hold profile data in memory only
+     - Not persist to localStorage
+     - Be simple and focused
+
+2. Update Home page navigation
+   - When clicking a profile card:
+     - Store the selected profile in the Pinia store
+     - Navigate to the profile details route
+   - Keep the NuxtLink wrapper on cards
+
+3. Routing
+   - Implement a dynamic route for profile details
+   - Extract profile id from route params
+
+4. Profile data resolution
+   - On the details page:
+     - Attempt to retrieve the profile from the Pinia store using the id
+     - If not found:
+       - Fetch profile data using the API client (getProfileById)
+   - Handle:
+     - Loading state
+     - Not found (404) state
+     - API errors gracefully
+
+5. Page layout
+   - Use the same gradient background as the Home page
+   - Constrain content width using max-w-7xl mx-auto
+   - Add a back button at the top:
+     - Uses router.back()
+     - Left arrow icon (Lucide)
+     - Hover and focus styles
+     - Do not make header sticky
+
+6. Profile header section
+   - Display large avatar:
+     - Reuse avatar/initials logic from ProfileCard if possible
+     - Circular, larger size
+   - Display:
+     - Full name as prominent heading
+     - Bio with purple accent styling
+
+7. Profile details section
+   - Display all remaining profile fields
+   - Use a single-column layout on all screen sizes
+   - Each field should include:
+     - Lucide icon
+     - Small muted label
+     - Primary value text
+   - Fields to display include:
+     - Job title
+     - Company
+     - Email
+     - Phone
+     - Age
+     - Address / Location
+
+8. Styling & accessibility
+   - Maintain dark, purple-based theme
+   - Use consistent spacing and alignment
+   - Ensure keyboard accessibility:
+     - Focus states for back button
+     - Proper contrast
+
+9. Code quality
+   - Keep logic readable and well-organized
+   - Avoid duplicating avatar logic
+   - Ensure TypeScript types are respected
+   - Avoid overengineering the store
+
+Output expectations:
+- Explain which files/components you will add or modify before coding
+- Ensure navigation feels natural
+- Ensure page works when accessed directly via URL
+- Ensure unnecessary refetching is avoided when possible
+
+After finishing:
+- Summarize data flow (store vs fallback fetch)
+- Confirm accessibility and responsiveness
+- Confirm readiness for search-driven navigation later
+```
+
+---
+
+### Why this prompt is strong
+
+* Clear separation of concerns
+* Pinia introduced with **justified scope**
+* Realistic navigation behavior
+* No wasted work or premature abstraction
+* Reviewers will immediately see intentional design
+
+Your next natural steps after this will be:
+
+* Search bar integration
+* URL-synced search
+* Empty-state UX
+
+Whenever you’re ready, we can line those up cleanly.
