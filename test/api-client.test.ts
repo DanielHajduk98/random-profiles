@@ -110,6 +110,29 @@ describe("api-client", () => {
     });
   });
 
+  it("normalizes unknown status errors", async () => {
+    createFetchStub(async () => {
+      throw { statusCode: 500, statusMessage: "Server Error" };
+    });
+
+    await expect(getProfiles()).rejects.toMatchObject({
+      type: "unknown",
+      statusCode: 500,
+      message: "Server Error",
+    });
+  });
+
+  it("falls back to unexpected errors for non-records", async () => {
+    createFetchStub(async () => {
+      throw "boom";
+    });
+
+    await expect(getProfiles()).rejects.toMatchObject({
+      type: "unknown",
+      message: "Unexpected error",
+    });
+  });
+
   it("exposes ApiClientError instances", async () => {
     const error = new ApiClientError("unknown", "Boom");
     createFetchStub(async () => {

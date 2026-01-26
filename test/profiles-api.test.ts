@@ -15,21 +15,6 @@ const runHandler = async (url: string) => {
   return { event, response };
 };
 
-const expectHttpError = (
-  action: () => unknown,
-  statusCode: number,
-  statusMessage: string,
-) => {
-  try {
-    action();
-  } catch (error) {
-    expect(error).toMatchObject({ statusCode, statusMessage });
-    return;
-  }
-
-  throw new Error("Expected handler to throw an HTTPError");
-};
-
 describe("GET /api/profiles", () => {
   it("initializes and caches the catalog", () => {
     const first = getProfileCatalog();
@@ -89,40 +74,44 @@ describe("GET /api/profiles", () => {
   it("returns 400 for invalid count", async () => {
     const event = mockEvent("http://localhost/api/profiles?count=abc");
 
-    expectHttpError(
-      () => handler(event),
-      400,
-      "count must be a positive integer",
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+        statusCode: 400,
+        statusMessage: "count must be a positive integer",
+      },
     );
   });
 
   it("returns 400 for negative count", async () => {
     const event = mockEvent("http://localhost/api/profiles?count=-1");
 
-    expectHttpError(
-      () => handler(event),
-      400,
-      "count must be a positive integer",
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+        statusCode: 400,
+        statusMessage: "count must be a positive integer",
+      },
     );
   });
 
   it("returns 400 for repeated query param", async () => {
     const event = mockEvent("http://localhost/api/profiles?q=one&q=two");
 
-    expectHttpError(
-      () => handler(event),
-      400,
-      "Param must be provided once",
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+        statusCode: 400,
+        statusMessage: "Param must be provided once",
+      },
     );
   });
 
   it("returns 400 for repeated count param", async () => {
     const event = mockEvent("http://localhost/api/profiles?count=5&count=6");
 
-    expectHttpError(
-      () => handler(event),
-      400,
-      "Param must be provided once",
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+        statusCode: 400,
+        statusMessage: "Param must be provided once",
+      },
     );
   });
 });

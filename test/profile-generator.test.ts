@@ -18,6 +18,17 @@ describe("generateProfile", () => {
     expect(first).toEqual(second);
   });
 
+  it("uses seed for randomness when provided", () => {
+    const first = generateProfile({ id: "profile-123", seed: "seed-a" });
+    const second = generateProfile({ id: "profile-999", seed: "seed-a" });
+
+    const normalize = <TProfile extends { id: string; avatarUrl: string }>(
+      profile: TProfile,
+    ) => ({ ...profile, id: "fixed", avatarUrl: "fixed" });
+
+    expect(normalize(first)).toEqual(normalize(second));
+  });
+
   it("returns different output for different seeds", () => {
     const first = generateProfile({ seed: "seed-a" });
     const second = generateProfile({ seed: "seed-b" });

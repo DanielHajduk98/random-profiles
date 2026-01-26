@@ -15,21 +15,6 @@ const runHandler = async (id?: string) => {
   return { event, response };
 };
 
-const expectHttpError = (
-  action: () => unknown,
-  statusCode: number,
-  statusMessage: string,
-) => {
-  try {
-    action();
-  } catch (error) {
-    expect(error).toMatchObject({ statusCode, statusMessage });
-    return;
-  }
-
-  throw new Error("Expected handler to throw an HTTPError");
-};
-
 describe("GET /api/profile/:id", () => {
   it("returns a matching profile by id", async () => {
     const catalog = getProfileCatalog();
@@ -47,13 +32,23 @@ describe("GET /api/profile/:id", () => {
     const event = mockEvent("http://localhost/api/profile");
     event.context.params = { id: "profile-does-not-exist" };
 
-    expectHttpError(() => handler(event), 404, "Not Found");
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+      statusCode: 404,
+      statusMessage: "Not Found",
+    },
+    );
   });
 
   it("returns 400 when id is missing", async () => {
     const event = mockEvent("http://localhost/api/profile");
 
-    expectHttpError(() => handler(event), 400, "Bad Request");
+    await expect(Promise.resolve().then(() => handler(event))).rejects.toMatchObject(
+      {
+      statusCode: 400,
+      statusMessage: "Bad Request",
+    },
+    );
   });
 
   it("returns deterministic results for the same id", async () => {
