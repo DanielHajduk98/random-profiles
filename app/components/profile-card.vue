@@ -4,7 +4,7 @@
   >
     <NuxtLink
       :to="`/profile/${profile.id}`"
-      class="absolute inset-0 rounded-2xl focus-visible:outline-none"
+      class="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none"
       :aria-label="`View profile for ${profile.name}`"
       @click="handleSelect"
     />
