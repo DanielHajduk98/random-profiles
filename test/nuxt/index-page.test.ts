@@ -94,7 +94,7 @@ describe("index page", () => {
       expect.any(Function),
       expect.any(Object),
     );
-    expect(getProfilesMock).toHaveBeenCalledWith({ count: 16 });
+    expect(getProfilesMock).toHaveBeenCalledWith({ count: 8, query: undefined });
   });
 
   it("renders loading skeletons while pending", async () => {
@@ -104,7 +104,7 @@ describe("index page", () => {
 
     const status = wrapper.get('[role="status"]');
     expect(status.attributes("aria-live")).toBe("polite");
-    expect(status.element.children.length).toBe(16);
+    expect(status.element.children.length).toBe(8);
   });
 
   it("renders an error message for ApiClientError", async () => {
@@ -147,13 +147,13 @@ describe("index page", () => {
     expect(cards[1]?.attributes("data-profile-id")).toBe("profile-2");
   });
 
-  it("renders the shared search input", async () => {
+  it("renders the search call to action", async () => {
     useAsyncDataMock.mockResolvedValue(makeAsyncData());
 
     const wrapper = await mountSuspended(IndexPage);
 
-    const input = wrapper.get('input[type="search"]');
-    expect(input.attributes("placeholder")).toBe("Search profiles...");
+    const link = wrapper.get('a[href="/search"]');
+    expect(link.text()).toContain("Search Profiles");
   });
 
   it("sets the document head title and description", async () => {

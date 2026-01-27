@@ -320,3 +320,669 @@ we should reprezent the age in a different way than in the middle of the profile
 # figma make
 
 I've moved the age to the Professional section, which now displays three fields in a balanced grid: Job Title, Company, and Age. This feels much more natural than having it interrupt the header section, and it creates better visual balance across the profile page.
+
+---
+# user
+I want separate catalogue page which displays 20 profiles and a search page which limits the profiles to 10. How can i differentiate those pages? Are they any features that first page should have?
+
+---
+# figma-make
+Great question! Here's how you can differentiate these two pages:
+Catalogue Page (20 profiles) - Browse & Discover
+
+Primary Features:
+
+    Featured/highlighted profiles at the top (2-4 profiles with larger cards or special styling)
+    Category filters (by role, location, company) as pills/tabs below header
+    Sort options (newest, alphabetical, by age, by company)
+    View toggle (grid vs. compact list view)
+    "All Profiles" header with total count badge (e.g., "All Profiles · 20")
+    Pagination or infinite scroll if catalogue grows beyond 20
+    No search bar - keeps it clean and browse-focused
+
+Visual Identity:
+
+    Larger, more spacious cards (current 4-column grid works well)
+    Rich visuals, emphasis on avatars and imagery
+    "Explore" or "Browse" language
+    Could have hero section or categories
+
+Search Page (10 profiles) - Find & Filter
+
+Primary Features:
+
+    Prominent search input with real-time filtering
+    Search results count ("10 results for 'designer'" or "Showing 10 of 20")
+    Advanced filters sidebar (age range, job title, location, company)
+    Compact list/card view (maybe 2 columns instead of 4, or even list layout)
+    Matched text highlighting in name/bio/job title
+    Sort by relevance (plus name, age, etc.)
+    Empty state ("No profiles match your search")
+    Recent searches or suggestions
+
+Visual Identity:
+
+    Denser, more compact cards showing more info at a glance
+    Could show job title + company in card (not just name + bio)
+    "Search & Filter" or "Find Profiles" header
+    Functional, tool-like aesthetic
+
+Key Differentiators:
+Aspect	Catalogue	Search
+Purpose	Discovery, browsing	Finding specific people
+Layout	Spacious grid (4 cols)	Compact grid/list (2 cols)
+Card size	Larger, image-focused	Smaller, info-dense
+Filters	Categories, broad sorting	Specific filters, search
+Header	Clean, minimal	Search bar prominent
+Count	"All Profiles · 20"	"10 results found"
+Navigation	Root path / or /browse	/search
+Routing Suggestion:
+
+/              → Catalogue (20 profiles, no search)
+/search        → Search page (10 profiles, full search UI)
+/profile/:id   → Detail page (current)
+
+Alternative: Combined Approach
+
+If you want a more seamless experience, you could have:
+
+    Default catalogue view at / (no search visible, 20 profiles)
+    Search mode toggle - clicking search icon transforms page into search mode (10 results, filters appear)
+    This keeps users on one page but changes the UI dramatically
+
+Would you like me to implement the two separate pages, or would you prefer the combined approach? If separate pages, should the catalogue page have any navigation to the search page?
+
+---
+# user
+
+yes
+
+---
+# figma-make
+
+I'll implement two separate pages with distinct purposes. Let me create a catalogue page and a dedicated search page.
+
+I've implemented two distinct pages with clear differentiation:
+
+Browse Page (/) - Discovery & Exploration
+
+    Shows all 20 profiles in a spacious 4-column grid
+    Features role-based filter pills and sorting (by name, age, company)
+    Clean header with profile count and a button to navigate to search
+    No search input - keeps focus on browsing
+    Perfect for casual exploration
+
+Search Page (/search) - Targeted Finding
+
+    Displays 10 profiles maximum with real-time search
+    Prominent search bar with autoclear button
+    Highlights matched text in yellow/purple
+    Toggle between compact list view (2 columns with job/company visible) and grid view (3 columns)
+    Shows result count and "no results" empty state
+    More functional, tool-like interface
+
+The key differentiators are the layout density, presence of search functionality, and the overall purpose - browse for discovery vs. search for finding specific people.
+
+---
+# user
+
+redesign the welcome page, i want to display few profiles. I don't want any filters, just a nice welcome message with few profiles. I'm thinking also about infinite load or add more button to it, which will generate more random profiles
+
+---
+# figma-make
+
+Perfect! I've redesigned the welcome page with a beautiful hero section featuring a welcoming message, "Meet Amazing People," along with a call-to-action to search profiles. The page now displays 8 random profiles initially and includes a "Load More Profiles" button that adds 8 more each time it's clicked. The profiles are shuffled randomly on page load, and when all profiles are viewed, users see a friendly message suggesting they try the search feature instead. All filters and sorting have been removed for a clean, welcoming experience.
+
+---
+# user
+what other features i can add to search page to make it stand out even more?
+
+---
+#figma-make
+
+Great question! Here are some standout features that would really elevate the search page:
+High-Impact Features
+1. Advanced Filters Sidebar
+
+    Age range slider (e.g., 25-35)
+    Multi-select company filter with checkboxes
+    Location filter (if you add city/country to profile data)
+    Experience level (Junior, Mid, Senior based on age/title)
+    Active filters badge count + "Clear all" button
+    Collapsible filter sections
+
+2. Recent Searches
+
+    Show last 5 searches as clickable chips below search bar
+    "Clear history" option
+    Persists in localStorage
+
+3. Search Suggestions/Autocomplete
+
+    Dropdown as you type showing:
+        Matching names
+        Popular companies
+        Job titles
+        "Press Enter to search for..."
+    Keyboard navigation (↑↓ arrows)
+
+4. Smart Sort Options
+
+    Sort by relevance (how well they match query)
+    Name A-Z / Z-A
+    Age (youngest/oldest first)
+    Recently added (if you add timestamps)
+
+5. Saved/Favorite Profiles
+
+    Heart icon on cards to save favorites
+    "Saved Profiles" filter toggle
+    Persists in localStorage
+    Count badge (e.g., "5 saved")
+
+6. Keyboard Shortcuts
+
+    / to focus search input
+    ESC to clear search
+    Arrow keys to navigate results
+    Enter to open highlighted profile
+    Show shortcuts hint at bottom
+
+7. Search Operators (Power User Feature)
+
+    "exact match" for phrases
+    -exclude to remove terms
+    company:Google for field-specific search
+    Help tooltip explaining operators
+
+8. Bulk Selection & Compare
+
+    Checkbox mode to select multiple profiles
+    "Compare Selected" button (2-3 profiles max)
+    Side-by-side comparison view showing all fields
+
+9. Export Results
+
+    "Export as CSV" button
+    Download filtered results
+    Copy results to clipboard
+
+10. Field-Specific Search Toggle
+
+    Pills to search only in: Name Bio Job Title Company All
+    Multiple selections possible
+
+11. Search Stats/Insights
+
+    "Most searched profiles this week"
+    "Trending companies"
+    "Popular roles"
+    Shows in empty state or sidebar
+
+12. Save Search Query
+
+    "Save this search" button
+    Name your saved searches
+    Quick access to run saved searches again
+
+My Top 5 Recommendations
+
+If I were to implement the most impactful features:
+
+    Advanced Filters Sidebar (age, company, clear all) - Makes search much more powerful
+    Recent Searches - Huge UX improvement, easy to implement
+    Saved/Favorite Profiles - Adds personal value, encourages return visits
+    Keyboard Shortcuts - Makes power users love it
+    Bulk Compare Mode - Unique feature that's really useful
+
+Would you like me to implement any of these? I'd suggest starting with the filters sidebar + recent searches + favorites as they work really well together!
+
+---
+# user
+write a prompt describing the welcome screen using tailwind. Use the css grid layout that is readable by other ai. We don't need to change the profile cards so only focus on elements above profile cards
+
+---
+# figma-make
+
+# Welcome Screen Hero Section - Design Specification
+
+## Layout Structure
+A centered hero section using CSS Grid and Flexbox, positioned above the profile cards grid. The container uses `max-w-7xl mx-auto px-6 py-12` for consistent page width.
+
+## Hero Section Container
+- **Layout**: `text-center mb-16` (centered text, large bottom margin)
+- **Background**: Inherits the gradient from parent (`bg-gradient-to-tr from-black via-black to-purple-900`)
+
+## Elements (Top to Bottom)
+
+### 1. Welcome Badge
+- **Container**: Inline flex container with rounded pill shape
+  - Classes: `inline-flex items-center gap-2 px-4 py-2 bg-purple-600/20 rounded-full border border-purple-500/30 mb-6`
+  - Background: Semi-transparent purple (20% opacity)
+  - Border: Purple with 30% opacity
+  - Spacing: 24px bottom margin
+
+- **Icon**: Sparkles icon from lucide-react
+  - Classes: `w-4 h-4 text-purple-400`
+  - Size: 16x16px
+  - Color: Purple-400
+
+- **Text**: "Welcome to our community"
+  - Classes: `text-purple-400 text-sm`
+  - Color: Purple-400
+  - Size: Small (14px)
+
+### 2. Main Heading
+- **Text**: "Meet Amazing People"
+- **Classes**: `text-5xl md:text-6xl text-white mb-4`
+- **Responsive**: 
+  - Mobile: text-5xl (48px)
+  - Desktop (md+): text-6xl (60px)
+- **Color**: White
+- **Spacing**: 16px bottom margin
+
+### 3. Description Paragraph
+- **Text**: "Discover talented professionals from around the world. Connect, collaborate, and grow together."
+- **Classes**: `text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto mb-8`
+- **Responsive**:
+  - Mobile: text-lg (18px)
+  - Desktop (md+): text-xl (20px)
+- **Max Width**: 2xl (672px), centered with `mx-auto`
+- **Color**: Zinc-400 (muted gray)
+- **Spacing**: 32px bottom margin
+
+### 4. Call-to-Action Button
+- **Container**: Inline flex button
+  - Classes: `inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors shadow-lg shadow-purple-600/20`
+  - Background: Solid purple-600, darkens to purple-700 on hover
+  - Padding: 24px horizontal, 12px vertical
+  - Border radius: Extra large (12px)
+  - Shadow: Large purple glow at 20% opacity
+
+- **Icon**: Search icon from lucide-react
+  - Classes: `w-5 h-5`
+  - Size: 20x20px
+  - Color: Inherits white from parent
+
+- **Text**: "Search Profiles"
+  - Color: Inherits white from parent
+  - No additional classes
+
+## Design Tokens
+- **Purple accent**: `purple-400` for text/icons, `purple-600` for solid backgrounds
+- **Dark backgrounds**: `zinc-900/50` for semi-transparent, `zinc-800` for hover states
+- **Text hierarchy**: 
+  - Primary: `text-white`
+  - Secondary: `text-zinc-400`
+  - Accent: `text-purple-400`
+- **Spacing scale**: Uses Tailwind's default spacing (mb-4, mb-6, mb-8, mb-16)
+- **Transitions**: `transition-colors` for smooth hover effects
+
+## Responsive Behavior
+- Text scales up on medium breakpoint (md: 768px+)
+- Description paragraph constrains to max-w-2xl and centers on all screens
+- All elements remain centered across all viewport sizes
+
+---
+# user
+
+now describe the search profiles page and create a css grid template like message to describe the layout.
+
+---
+# figma-make
+
+```
+# Search Profiles Page - Design Specification
+
+## Page Layout Structure
+```
+
+┌─────────────────────────────────────────────────────────────┐ │ Page Container (max-w-7xl) │ │ ┌───────────────────────────────────────────────────────┐ │ │ │ Header Section (mb-8) │ │ │ │ ┌─────────────────────────────────────────────────┐ │ │ │ │ │ Title Row (flex justify-between) │ │ │ │ │ │ ├─ "Search Profiles" (left) │ │ │ │ │ │ └─ "Browse All →" link (right) │ │ │ │ │ └─────────────────────────────────────────────────┘ │ │ │ │ │ │ │ │ ┌─────────────────────────────────────────────────┐ │ │ │ │ │ Search Bar (relative container) │ │ │ │ │ │ ├─ Search icon (absolute left) │ │ │ │ │ │ ├─ Input field (full width) │ │ │ │ │ │ └─ Clear button (absolute right, conditional) │ │ │ │ │ └─────────────────────────────────────────────────┘ │ │ │ │ │ │ │ │ ┌─────────────────────────────────────────────────┐ │ │ │ │ │ Results Bar (flex justify-between) │ │ │ │ │ │ ├─ Results count (left) │ │ │ │ │ │ └─ View toggle buttons (right, flex gap-2) │ │ │ │ │ └─────────────────────────────────────────────────┘ │ │ │ └───────────────────────────────────────────────────────┘ │ │ │ │ ┌───────────────────────────────────────────────────────┐ │ │ │ Results Grid (responsive) │ │ │ │ ┌──────┐ ┌──────┐ ┌──────┐ (Grid View) │ │ │ │ │Card 1│ │Card 2│ │Card 3│ │ │ │ │ └──────┘ └──────┘ └──────┘ │ │ │ │ ┌──────┐ ┌──────┐ ┌──────┐ │ │ │ │ │Card 4│ │Card 5│ │Card 6│ │ │ │ │ └──────┘ └──────┘ └──────┘ │ │ │ │ │ │ │ │ OR │ │ │ │ │ │ │ │ ┌─────────────────┐ ┌─────────────────┐ (List) │ │ │ │ │ Card 1 Wide │ │ Card 2 Wide │ │ │ │ │ └─────────────────┘ └─────────────────┘ │ │ │ │ ┌─────────────────┐ ┌─────────────────┐ │ │ │ │ │ Card 3 Wide │ │ Card 4 Wide │ │ │ │ │ └─────────────────┘ └─────────────────┘ │ │ │ └───────────────────────────────────────────────────────┘ │ │ │ │ ┌───────────────────────────────────────────────────────┐ │ │ │ Empty State (conditional, centered) │ │ │ │ ┌───────────────────────────────────────────────┐ │ │ │ │ │ Search icon (large, centered) │ │ │ │ │ │ "No profiles found" heading │ │ │ │ │ │ "Try adjusting your search query" text │ │ │ │ │ └───────────────────────────────────────────────┘ │ │ │ └───────────────────────────────────────────────────────┘ │ └────────────────────────────────────────────────────────────
+
+```
+## CSS Grid Template
+
+```css
+/* Page Container */
+.page-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 2rem;
+  max-width: 80rem; /* max-w-7xl */
+  margin: 0 auto;
+  padding: 3rem 1.5rem; /* py-12 px-6 */
+}
+
+/* Header Section */
+.header-section {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 1.5rem; /* mb-6 between elements */
+}
+
+/* Title Row */
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Search Bar Container */
+.search-bar-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Results Bar */
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* View Toggle Group */
+.view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Results Grid - Grid View */
+.results-grid-view {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem; /* gap-6 */
+}
+
+@media (min-width: 768px) {
+  .results-grid-view {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .results-grid-view {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Results Grid - List View */
+.results-list-view {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .results-list-view {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Profile Card - List Layout */
+.profile-card-list {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+/* Profile Card - Grid Layout */
+.profile-card-grid {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  text-align: center;
+}
+```
+
+Component Breakdown
+1. Page Container
+
+    Classes: min-h-screen bg-gradient-to-tr from-black via-black to-purple-900
+    Inner Container: max-w-7xl mx-auto px-6 py-12
+
+2. Header Section (mb-8)
+A. Title Row (mb-6)
+
+    Container: flex items-center justify-between mb-6
+
+    Left: Page Title
+        Text: "Search Profiles"
+        Classes: text-white text-3xl
+
+    Right: Browse Link
+        Text: "Browse All →"
+        Classes: text-zinc-400 hover:text-white transition-colors text-sm
+        Action: Navigate to /
+
+B. Search Bar (mb-6)
+
+    Container: relative mb-6
+
+    Search Icon (absolute positioned)
+        Classes: absolute left-4 top-1/2 -translate-y-1/2
+        Icon: Search (lucide-react)
+        Icon classes: w-5 h-5 text-zinc-500
+
+    Input Field
+        Classes: w-full h-14 bg-zinc-900/50 backdrop-blur-sm rounded-xl border border-zinc-800/50 pl-12 pr-12 text-white placeholder:text-zinc-500 focus:outline-none focus:border-purple-500/50 transition-colors
+        Placeholder: "Search by name, role, company, or bio..."
+        Auto-focus: Yes
+        Height: 56px (h-14)
+        Padding: Left 48px (pl-12), Right 48px (pr-12)
+
+    Clear Button (conditional, absolute positioned)
+        Renders only when searchQuery exists
+        Classes: absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors
+        Icon: X (lucide-react)
+        Icon classes: w-5 h-5
+
+C. Results Info Bar
+
+    Container: flex items-center justify-between
+
+    Left: Results Count
+        Classes: text-zinc-400
+        Dynamic text:
+            With search: "X results found" (with purple-400 number)
+            Without search: "Showing 10 profiles" (with purple-400 number)
+            Shows "(showing first 10)" when results === 10
+
+    Right: View Toggle Buttons
+
+        Container: flex gap-2
+
+        Grid Button
+            Icon: Grid3x3 (lucide-react), w-4 h-4
+            Classes (active): p-2 rounded-lg bg-purple-600 text-white
+            Classes (inactive): p-2 rounded-lg bg-zinc-900/50 text-zinc-400 hover:text-white transition-colors
+
+        List Button
+            Icon: List (lucide-react), w-4 h-4
+            Classes: Same as Grid button
+
+3. Results Section
+A. Results Grid (Conditional - When results exist)
+
+Grid View Mode
+
+    Container classes: grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+    Responsive:
+        Mobile: 1 column
+        Medium (768px+): 2 columns
+        Large (1024px+): 3 columns
+
+List View Mode
+
+    Container classes: grid gap-6 grid-cols-1 md:grid-cols-2
+    Responsive:
+        Mobile: 1 column
+        Medium (768px+): 2 columns
+
+B. Profile Card (Custom, not using ProfileCard component)
+
+    Container: bg-zinc-900/50 backdrop-blur-sm rounded-xl p-6 border border-zinc-800/50 hover:border-purple-500/50 transition-all cursor-pointer group hover:scale-[1.02]
+
+Grid View Layout
+
+    Avatar container: flex justify-center mb-4
+    Avatar: w-20 h-20 rounded-full overflow-hidden ring-2 ring-purple-500/30 group-hover:ring-purple-500/60 transition-all
+    Name: text-white text-center mb-2
+    Bio: text-zinc-400 text-sm text-center
+
+List View Layout
+
+    Container: flex gap-4 items-start
+    Avatar container: flex-shrink-0
+    Avatar: w-16 h-16 rounded-full overflow-hidden ring-2 ring-purple-500/30 group-hover:ring-purple-500/60 transition-all
+    Content wrapper: flex-1 min-w-0
+    Name: text-white text-lg
+    Job info: text-purple-400 text-sm mb-2 (job title + company)
+    Bio: text-zinc-400 text-sm
+
+Search Highlighting
+
+    Matched text wrapped in <mark> tag
+    Classes: bg-purple-600/30 text-purple-300
+
+C. Empty State (Conditional - When no results)
+
+    Container: text-center py-16
+
+    Icon: Search (lucide-react)
+        Classes: w-16 h-16 text-zinc-700 mx-auto mb-4
+
+    Heading: "No profiles found"
+        Classes: text-white text-xl mb-2
+
+    Description: "Try adjusting your search query"
+        Classes: text-zinc-500
+
+Design Tokens
+Colors
+
+    Background: Gradient from black to purple-900
+    Cards: bg-zinc-900/50 with border-zinc-800/50
+    Hover states: border-purple-500/50, bg-purple-600
+    Text hierarchy:
+        Primary: text-white
+        Secondary: text-zinc-400
+        Muted: text-zinc-500
+        Accent: text-purple-400
+        Highlight: bg-purple-600/30 text-purple-300
+
+Spacing
+
+    Container padding: px-6 py-12
+    Section gap: mb-8
+    Element gaps: mb-6, mb-4, mb-2
+    Grid gaps: gap-6, gap-4, gap-2
+
+Interactive States
+
+    Hover scale: hover:scale-[1.02]
+    Transitions: transition-all, transition-colors
+    Focus: focus:outline-none focus:border-purple-500/50
+    Group hover: group-hover:ring-purple-500/60
+
+Responsive Breakpoints
+
+    Small: < 768px (mobile)
+    Medium: 768px+ (md:)
+    Large: 1024px+ (lg:)
+
+Functional Features
+
+    Real-time search: Filters as user types
+    Text highlighting: Matches are highlighted in purple
+    View modes: Toggle between grid (3 cols) and list (2 cols) layouts
+    Results limit: Maximum 10 profiles displayed
+    Auto-focus: Search input focuses on page load
+    Clear search: X button appears when query exists
+
+---
+# user
+
+wrap the css grid template in codeblock
+
+---
+# figma-make
+
+(the same message as above)
+
+---
+# user
+
+omit everything else from your message. Write only the page layout structure in css grid like template. Wrap the grid template with codeblock ``` signs
+
+---
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Page Container (max-w-7xl)                │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Header Section (mb-8)                    │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │  Title Row (flex justify-between)               │  │  │
+│  │  │  ├─ "Search Profiles" (left)                    │  │  │
+│  │  │  └─ "Browse All →" link (right)                 │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  │                                                       │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │  Search Bar (relative container)                │  │  │
+│  │  │  ├─ Search icon (absolute left)                 │  │  │
+│  │  │  ├─ Input field (full width)                    │  │  │
+│  │  │  └─ Clear button (absolute right, conditional)  │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  │                                                       │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │  Results Bar (flex justify-between)             │  │  │
+│  │  │  ├─ Results count (left)                        │  │  │
+│  │  │  └─ View toggle buttons (right, flex gap-2)     │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │           Results Grid (responsive)                   │  │
+│  │  ┌──────┐  ┌──────┐  ┌──────┐  (Grid View)          │  │
+│  │  │Card 1│  │Card 2│  │Card 3│                        │  │
+│  │  └──────┘  └──────┘  └──────┘                        │  │
+│  │  ┌──────┐  ┌──────┐  ┌──────┐                        │  │
+│  │  │Card 4│  │Card 5│  │Card 6│                        │  │
+│  │  └──────┘  └──────┘  └──────┘                        │  │
+│  │                                                       │  │
+│  │     OR                                                │  │
+│  │                                                       │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐  (List)   │  │
+│  │  │   Card 1 Wide   │  │   Card 2 Wide   │           │  │
+│  │  └─────────────────┘  └─────────────────┘           │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐           │  │
+│  │  │   Card 3 Wide   │  │   Card 4 Wide   │           │  │
+│  │  └─────────────────┘  └─────────────────┘           │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │         Empty State (conditional, centered)           │  │
+│  │  ┌───────────────────────────────────────────────┐    │  │
+│  │  │  Search icon (large, centered)                │    │  │
+│  │  │  "No profiles found" heading                  │    │  │
+│  │  │  "Try adjusting your search query" text       │    │  │
+│  │  └───────────────────────────────────────────────┘    │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+# user
+remove the grid change functionality. WDYT about makeing the back button on the left to keep it in line with details page.  Profiles should use the "list" card type in two rows
+
+---
+# figma-make
+
+Perfect! I've updated the search page with your suggestions:
+
+    Removed grid/list toggle - Simplified the UI by removing the view mode switcher
+    Back button on the left - Moved to align with the detail page pattern using ArrowLeft icon with "Back to Browse" text
+    List card layout only - All profiles now display in the horizontal list card format (avatar on left, content on right) in a 2-column grid
+
+This creates better consistency across pages and a cleaner, more focused search experience. The back button placement makes navigation more intuitive since it matches the pattern users see on detail pages.
