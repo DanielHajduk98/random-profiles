@@ -1,13 +1,6 @@
 <template>
   <div class="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-12">
-    <button
-      type="button"
-      class="inline-flex self-start items-center gap-2 rounded-full text-sm text-slate-300 transition hover:text-slate-100 active:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-      @click="handleBack"
-    >
-      <ArrowLeft class="h-4 w-4 -translate-x-0.5" aria-hidden="true" />
-      <span>Back</span>
-    </button>
+    <BackButton />
 
     <section class="flex flex-col gap-6">
       <div
@@ -46,7 +39,7 @@
 
       <div v-else-if="profile" class="flex flex-col">
         <div
-          class="mb-6 rounded-2xl bg-zinc-900/50 p-8 backdrop-blur-sm"
+          class="mb-6 rounded-2xl border border-purple-900/50 bg-slate-950/60 p-8 backdrop-blur-sm"
         >
           <div class="flex flex-col items-center text-center">
             <ProfileAvatar
@@ -67,7 +60,7 @@
         </div>
 
         <div
-          class="mb-6 rounded-2xl bg-zinc-900/50 p-8 backdrop-blur-sm"
+          class="mb-6 rounded-2xl border border-purple-900/50 bg-slate-950/60 p-8 backdrop-blur-sm"
         >
           <div class="mb-6 flex items-center gap-3 text-purple-400">
             <Briefcase class="h-5 w-5" aria-hidden="true" />
@@ -94,7 +87,7 @@
         </div>
 
         <div
-          class="rounded-2xl bg-zinc-900/50 p-8 backdrop-blur-sm"
+          class="rounded-2xl border border-purple-900/50 bg-slate-950/60 p-8 backdrop-blur-sm"
         >
           <div class="mb-6 flex items-center gap-3 text-purple-400">
             <Mail class="h-5 w-5" aria-hidden="true" />
@@ -148,9 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import {
-  ArrowLeft,
   Briefcase,
   Building2,
   IdCardLanyard,
@@ -158,12 +149,12 @@ import {
   MapPin,
   Phone,
 } from "lucide-vue-next";
-import { ApiClientError, getProfileById } from "../../utils/api-client";
+import { computed } from "vue";
 import type { Profile } from "../../../lib/types/profile-schema";
 import { useProfileStore } from "../../stores/profile-store";
+import { ApiClientError, getProfileById } from "../../utils/api-client";
 
 const route = useRoute();
-const router = useRouter();
 const profileStore = useProfileStore();
 
 const profileId = computed(() => {
@@ -232,10 +223,6 @@ const errorMessage = computed(() => {
 
   return "Unexpected error";
 });
-
-const handleBack = () => {
-  router.back();
-};
 
 useHead(() => ({
   title: profile.value ? `${profile.value.name} - Profile` : "Profile Details",

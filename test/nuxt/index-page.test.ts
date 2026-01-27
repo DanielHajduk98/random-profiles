@@ -80,14 +80,20 @@ describe("index page", () => {
   it("requests profiles using the configured count", async () => {
     const profiles = [makeProfile({ id: "profile-1" })];
     getProfilesMock.mockResolvedValue(profiles);
-    useAsyncDataMock.mockImplementation(async (_key: string, handler: () => unknown) => {
-      const result = await handler();
-      return makeAsyncData({ data: result as Profile[] });
-    });
+    useAsyncDataMock.mockImplementation(
+      async (_key: string, handler: () => unknown) => {
+        const result = await handler();
+        return makeAsyncData({ data: result as Profile[] });
+      },
+    );
 
     await mountSuspended(IndexPage);
 
-    expect(useAsyncDataMock).toHaveBeenCalledWith("profiles", expect.any(Function));
+    expect(useAsyncDataMock).toHaveBeenCalledWith(
+      "profiles-home",
+      expect.any(Function),
+      expect.any(Object),
+    );
     expect(getProfilesMock).toHaveBeenCalledWith({ count: 16 });
   });
 
@@ -139,6 +145,15 @@ describe("index page", () => {
     expect(cards).toHaveLength(2);
     expect(cards[0]?.attributes("data-profile-id")).toBe("profile-1");
     expect(cards[1]?.attributes("data-profile-id")).toBe("profile-2");
+  });
+
+  it("renders the shared search input", async () => {
+    useAsyncDataMock.mockResolvedValue(makeAsyncData());
+
+    const wrapper = await mountSuspended(IndexPage);
+
+    const input = wrapper.get('input[type="search"]');
+    expect(input.attributes("placeholder")).toBe("Search profiles...");
   });
 
   it("sets the document head title and description", async () => {
