@@ -1,6 +1,15 @@
-# Nuxt Minimal Starter
+# Random Profiles App
+
+Random profile directory built with Nuxt 4, with search + detail views and a small server API.
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+## Screenshots
+
+| Welcome | Search | Details |
+| --- | --- | --- |
+| ![Profiles gallery](./readme-img/index.png) | ![Profile search](./readme-img/search.png) | ![Profile details](./readme-img/details.png) |
+
 
 ## Setup
 
