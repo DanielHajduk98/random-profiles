@@ -56,6 +56,12 @@ describe("profile-query-validation", () => {
     expect(parseQueryParam("  Ada  ")).toBe("Ada");
   });
 
+  it("caps long query strings", () => {
+    const longValue = "a".repeat(100);
+    const result = parseQueryParam(longValue);
+    expect(result).toBe("a".repeat(64));
+  });
+
   it("rejects repeated or non-string query values", () => {
     expectBadRequest(
       () => parseQueryParam(["one", "two"]),

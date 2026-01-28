@@ -1,6 +1,7 @@
 import { createError } from "h3";
 
 const REPEATED_PARAM_ERROR = "Param must be provided once";
+const MAX_QUERY_LENGTH = 64;
 
 const isRepeatedParam = (value: unknown): boolean => Array.isArray(value);
 
@@ -45,8 +46,15 @@ export const parseQueryParam = (
 
   if (typeof value === "string") {
     const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : undefined;
-  }
+    if (trimmed.length === 0) {
+      return undefined;
+    }
+
+    if (trimmed.length > MAX_QUERY_LENGTH) {
+      return trimmed.slice(0, MAX_QUERY_LENGTH);
+    }
+
+    return trimmed;  }
 
   throwBadRequest("q must be a string");
 };
