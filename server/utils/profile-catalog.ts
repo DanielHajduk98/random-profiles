@@ -1,4 +1,4 @@
-import { ProfileSchema, type Profile } from "~~/lib/types/profile-schema";
+import { type Profile } from "~~/lib/types/profile-schema";
 import { generateProfile } from "#server/utils/profile-generator";
 
 const PROFILE_CATALOG_SIZE = 2000;
@@ -22,7 +22,7 @@ const buildCatalog = (): Profile[] => {
     }
 
     seenIds.add(profile.id);
-    catalog.push(ProfileSchema.parse(profile));
+    catalog.push(profile);
   }
 
   return catalog;
