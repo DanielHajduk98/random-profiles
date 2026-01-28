@@ -56,7 +56,8 @@ export default defineEventHandler((event) => {
     });
 
     return profiles;
-  } catch {
+  } catch (error) {
+    console.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: "Internal Server Error",

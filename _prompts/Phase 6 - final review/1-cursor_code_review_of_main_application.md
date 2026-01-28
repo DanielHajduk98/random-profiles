@@ -1,5 +1,5 @@
 # Code review of main application modules
-_Exported on 1/28/2026 at 18:49:30 GMT+1 from Cursor (2.4.21)_
+_Exported on 1/28/2026 at 19:13:47 GMT+1 from Cursor (2.4.21)_
 
 ---
 
@@ -244,4 +244,62 @@ In `server/api/profiles.get.ts`, the `try/catch` wraps the whole handler and ign
 ```
 
 So if `getProfileCatalog()` throws or `searchProfiles()` crashes, you only see “Internal Server Error” and no trace of why.
+
+---
+
+**User**
+
+Add console.error and 
+
+what is the best approach for this issue? Should the error propagate in message or should the server log it via console.error?
+
+---
+
+**Cursor**
+
+Best approach: keep client response generic, log full error on server.  
+Let known client errors (400/404) pass through; for unexpected errors, log with context and return 500.
+
+So: **propagate safe errors to client**, **console.error (or logger) for unexpected ones**.
+
+---
+
+**User**
+
+in this case then we should just add console.error?
+
+---
+
+**Cursor**
+
+Yes, add `console.error` for unexpected server errors, but don’t just log and still hide everything. Log + rethrow a sanitized 500, and let known `createError`/400/404 pass through unchanged. If you want, I’ll implement it along with moving `normalizeError` into a shared helper.
+
+---
+
+**User**
+
+Add cap for query in search api @server/api/profiles.get.ts 
+
+---
+
+**Cursor**
+
+Added server-side query cap (64 chars) in `parseQueryParam`, plus test coverage.
+
+- Updated `server/utils/profile-query-validation.ts` to truncate long queries
+- Added cap test in `test/profile-query-validation.test.ts`
+
+Run tests if needed: `npm test -- profile-query-validation.test.ts`
+
+---
+
+**User**
+
+what is the best approach here? should we slice the query or should we throw an error?
+
+---
+
+**Cursor**
+
+Best here: **slice**, not error. It matches client behavior, avoids 400s from harmless long input, and keeps search predictable.
 
