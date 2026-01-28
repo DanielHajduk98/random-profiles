@@ -10,7 +10,7 @@
     <input
       :id="inputId"
       :value="modelValue"
-      type="search"
+      type="text"
       :maxlength="maxlength"
       class="h-14 w-full rounded-xl border border-zinc-800/50 bg-zinc-900/50 pl-12 pr-12 text-white placeholder:text-zinc-500 backdrop-blur-sm transition-colors focus:border-purple-500/50 focus:outline-none"
       :placeholder="placeholder"
@@ -21,7 +21,7 @@
     <button
       v-if="modelValue"
       type="button"
-      class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-white"
+      class="absolute right-2 top-1/2 -translate-y-1/2 p-3 text-zinc-500 transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400/70 focus:ring-offset-2 focus:ring-offset-black rounded"
       aria-label="Clear search"
       @click="handleClear"
     >

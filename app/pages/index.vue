@@ -21,7 +21,11 @@
         <span>Search Profiles</span>
       </NuxtLink>
     </section>
-    <ProfilesResults :count="PROFILE_COUNT" results-key="profiles-home" />
+
+    <section>
+      <h2 class="sr-only">Featured Profiles</h2>
+      <ProfilesResults :count="PROFILE_COUNT" results-key="profiles-home" />
+    </section>
   </div>
 </template>
   
